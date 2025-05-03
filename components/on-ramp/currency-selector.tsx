@@ -19,7 +19,7 @@ const CURRENCIES = [
 export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-32">
+      <SelectTrigger className="w-full">
         <SelectValue placeholder="Currency" />
       </SelectTrigger>
       <SelectContent>

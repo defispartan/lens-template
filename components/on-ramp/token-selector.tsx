@@ -19,13 +19,13 @@ interface TokenSelectorProps {
 const TOKENS = [
   {
     chainId: 232,
-    address: "0x000000000000000000000000000000000000800A",
+    address: "0x0000000000000000000000000000000000000000",
     symbol: "GHO",
     name: "GHO",
     decimals: 18,
     logoUrl: "https://raw.githubusercontent.com/MetaMask/contract-metadata/master/icons/eip155:1/erc20:0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f.svg",
   },
-  {
+/*   {
     chainId: 232,
     address: "0xE5ecd226b3032910CEaa43ba92EE8232f8237553",
     symbol: "WETH",
@@ -40,7 +40,7 @@ const TOKENS = [
     name: "USDC",
     decimals: 18,
     logoUrl: "https://raw.githubusercontent.com/MetaMask/contract-metadata/master/icons/eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.svg",
-  },
+  }, */
 ]
 
 export function TokenSelector({ value, onChange }: TokenSelectorProps) {
@@ -55,7 +55,7 @@ export function TokenSelector({ value, onChange }: TokenSelectorProps) {
         }
       }}
     >
-      <SelectTrigger className="w-full">
+      <SelectTrigger className="w-64">
         <SelectValue>
           <div className="flex items-center gap-2">
             <Image

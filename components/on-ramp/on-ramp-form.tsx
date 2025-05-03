@@ -50,7 +50,7 @@ export function OnRampForm({ onQuoteGenerated }: OnRampFormProps) {
     logoUrl:
       "https://raw.githubusercontent.com/MetaMask/contract-metadata/master/icons/eip155:1/erc20:0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f.svg",
   })
-  const [amount, setAmount] = useState<string>("0.01")
+  const [amount, setAmount] = useState<string>("10")
 
   // use our Quote interface from quote-summary.tsx
   const [quote, setQuote] = useState<Quote | null>(null)
@@ -62,6 +62,7 @@ export function OnRampForm({ onQuoteGenerated }: OnRampFormProps) {
     () =>
       createThirdwebClient({
         clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID ?? "",
+        secretKey: process.env.NEXT_PUBLIC_THIRDWEB_SECRET_KEY ?? ""
       }),
     []
   )
@@ -82,12 +83,9 @@ export function OnRampForm({ onQuoteGenerated }: OnRampFormProps) {
         toTokenAddress: toToken.address,
         toAddress: address,
         toAmount: amount,
-        fromAddress: address
+        fromAddress: address,
+        isTestMode: false
       })
-      // cast to our Quote type
-      const q = realQuote as unknown as Quote
-      setQuote(q)
-      onQuoteGenerated(q.intentId)
     } catch (e: unknown) {
       console.error(e)
       // narrow error for TS
@@ -117,13 +115,6 @@ export function OnRampForm({ onQuoteGenerated }: OnRampFormProps) {
           <label className="text-sm font-medium">I want to spend</label>
           <div className="flex gap-2">
             <CurrencySelector value={fromCurrency} onChange={setFromCurrency} />
-            <Input
-              type="number"
-              placeholder="0.01"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="flex-1"
-            />
           </div>
         </div>
 
@@ -137,7 +128,16 @@ export function OnRampForm({ onQuoteGenerated }: OnRampFormProps) {
         {/* Receive section */}
         <div className="space-y-2">
           <label className="text-sm font-medium">I want to buy</label>
-          <TokenSelector value={toToken} onChange={setToToken} />
+          <div className="flex gap-2">
+            <TokenSelector value={toToken} onChange={setToToken} />
+            <Input
+                type="number"
+                placeholder="10"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="flex-1"
+              />
+          </div>
         </div>
 
         {/* Error & quote */}
