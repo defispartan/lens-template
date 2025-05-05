@@ -1,94 +1,143 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus } from "lucide-react"
-import Image from "next/image"
-import type React from "react"
+import { useAccount, useWalletClient } from "wagmi";
+import { useEffect, useState } from "react";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import { evmAddress } from "@lens-protocol/client";
+import Image from "next/image";
+import { signMessageWith } from "@lens-protocol/client/viem";
+import { lensClient } from "@/lens/client";
+import { UserPlus } from "lucide-react";
+import Link from "next/link";
 
-function FileCard({ title, metadata, thumbnail }: { title: string; metadata: string; thumbnail: string }) {
-  return (
-    <div className="group relative overflow-hidden rounded-lg border bg-white">
-      <div className="aspect-[4/3] overflow-hidden">
-        <Image
-          src={thumbnail || "/lens.svg"}
-          alt={title}
-          width={400}
-          height={300}
-          className="h-full w-full object-cover transition-transform group-hover:scale-105"
-        />
+export default function SocialPage() {
+  const { address } = useAccount();
+  const { data: walletClient } = useWalletClient();
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [authenticatedProfile, setAuthenticatedProfile] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!address) return;
+    setLoading(true);
+    fetchAccountsAvailable(lensClient, {
+      managedBy: evmAddress(address),
+      includeOwned: true,
+    }).then((result) => {
+      if (result.isOk()) {
+        setProfiles([...result.value.items]);
+      }
+      setLoading(false);
+    });
+  }, [address]);
+
+  const handleSignIn = async (profile: any) => {
+    if (!walletClient) return;
+    try {
+      const authenticated = await lensClient.login({
+        accountOwner: {
+          app: "0x8A5Cc31180c37078e1EbA2A23c861Acf351a97cE",
+          owner: address,
+          account: profile.account.address,
+        },
+        signMessage: signMessageWith(walletClient),
+      });
+      if (authenticated.isErr()) {
+        alert("Authentication failed: " + authenticated.error);
+      } else {
+        setAuthenticatedProfile(profile.account.address);
+      }
+    } catch (error: unknown) {
+      console.error("Failed to sign in:", error);
+    }
+  };
+
+  const handleLogOut = () => {
+    try {
+      setAuthenticatedProfile(null);
+    } catch (error: unknown) {
+      console.error("Failed to log out:", error);
+    }
+  };
+
+  if (!address) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-xl text-gray-600">Connect Wallet to view accounts</p>
       </div>
-      <div className="p-4">
-        <h3 className="font-medium text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-500">{metadata}</p>
+    );
+  }
+
+  return (
+    <div className="p-8 w-full">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold">Lens Accounts</h1>
+        <p className="text-gray-600 mt-2">Lens Accounts owned and managed by connected wallet</p>
+      </div>
+      {loading && <div>Loading...</div>}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+        {profiles.map((profile) => (
+          <div key={profile.account.address} className="w-full max-w-sm border rounded-lg p-6 flex flex-col items-center space-y-4 bg-white shadow-sm">
+            <div className="font-semibold text-lg">@{profile.account.username.localName}</div>
+            <div className="text-sm px-3 py-1 rounded-full bg-gray-100">
+              {profile.__typename === "AccountOwned" ? (
+                <span className="text-green-600">Owner</span>
+              ) : (
+                <span className="text-blue-600">Manager</span>
+              )}
+            </div>
+            <div className="w-[120px] h-[120px] rounded-full overflow-hidden bg-gray-100">
+              {profile.account.metadata?.picture ? (
+                <Image
+                  src={profile.account.metadata.picture}
+                  alt={profile.account.username.localName}
+                  width={120}
+                  height={120}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-gray-400">No image</span>
+                </div>
+              )}
+            </div>
+            <div className="h-[80px] flex flex-col items-center justify-center">
+              {authenticatedProfile === profile.account.address ? (
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="text-sm text-green-600 font-medium">Currently Logged In</div>
+                  <button
+                    className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                    onClick={handleLogOut}
+                  >
+                    Log Out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                  onClick={() => handleSignIn(profile)}
+                >
+                  Sign In
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="mt-12 flex justify-center">
+        <Link 
+          href="https://onboarding.lens.xyz/"
+          target="_blank"
+          className="flex items-center gap-2 text-black hover:text-gray-700 transition-colors border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-50"
+        >
+          <UserPlus className="w-5 h-5" />
+          <span>Create Account</span>
+        </Link>
       </div>
     </div>
-  )
-}
-
-export default function FileManager() {
-  return (
-    <div className="flex h-screen bg-white">
-      {/* Main content */}
-      <div className="flex-1">
-        <div className="p-6">
-          <div className="mb-6 flex items-center gap-4">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Upload
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Create folder
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M12 18.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13zM12 14a2 2 0 100-4 2 2 0 000 4z"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Record
-            </Button>
-          </div>
-
-          <div className="mb-6">
-            <Tabs defaultValue="recent">
-              <TabsList>
-                <TabsTrigger value="recent">Recent</TabsTrigger>
-                <TabsTrigger value="starred">Starred</TabsTrigger>
-                <TabsTrigger value="shared">Shared</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <FileCard title="Q4 Sales Deck" metadata="Shared folder • 8 presentations" thumbnail="/placeholder.svg" />
-            <FileCard title="Product Videos" metadata="Shared folder • 5 videos" thumbnail="/placeholder.svg" />
-            <FileCard title="ROI Calculator" metadata="Shared file • 1 Excel" thumbnail="/placeholder.svg" />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  );
 }
