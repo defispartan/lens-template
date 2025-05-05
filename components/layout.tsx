@@ -37,10 +37,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Image src="/lens.svg" alt="Lens" width={120} height={40} />
         </div>
         <nav className="space-y-1 px-2">
-          <NavItem href="/chain" icon={<LayoutGrid className="h-4 w-4" />} active={currentPath === "/chain"}>
-            Chain
-          </NavItem>
-          <NavItem
+        <NavItem
             href="/social"
             icon={
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -55,21 +52,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             Social
           </NavItem>
-          <NavItem
-            href="/bridge"
-            icon={
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 5h6"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            }
-            active={currentPath === "/bridge"}
-          >
-            Bridge
+          <NavItem href="/chain" icon={<LayoutGrid className="h-4 w-4" />} active={currentPath === "/chain"}>
+            Chain
           </NavItem>
           <NavItem
             href="/swap"
@@ -85,7 +69,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             }
             active={currentPath === "/swap"}
           >
-            Swap
+            Swap / Bridge
           </NavItem>
           <NavItem
             href="/on-ramp"
