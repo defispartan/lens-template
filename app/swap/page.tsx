@@ -1,94 +1,100 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus } from "lucide-react"
-import Image from "next/image"
-import type React from "react"
+import { LiFiWidget } from '@lifi/widget'
+import { useAccount } from 'wagmi'
 
-function FileCard({ title, metadata, thumbnail }: { title: string; metadata: string; thumbnail: string }) {
-  return (
-    <div className="group relative overflow-hidden rounded-lg border bg-white">
-      <div className="aspect-[4/3] overflow-hidden">
-        <Image
-          src={thumbnail || "/lens.svg"}
-          alt={title}
-          width={400}
-          height={300}
-          className="h-full w-full object-cover transition-transform group-hover:scale-105"
-        />
+export default function SwapPage() {
+  const { isConnected } = useAccount()
+
+  if (!isConnected) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-xl text-gray-600">Connect Wallet to view swap</p>
       </div>
-      <div className="p-4">
-        <h3 className="font-medium text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-500">{metadata}</p>
-      </div>
-    </div>
-  )
-}
+    )
+  }
 
-export default function FileManager() {
   return (
-    <div className="flex h-screen bg-white">
-      {/* Main content */}
-      <div className="flex-1">
-        <div className="p-6">
-          <div className="mb-6 flex items-center gap-4">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Upload
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Create folder
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M12 18.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13zM12 14a2 2 0 100-4 2 2 0 000 4z"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Record
-            </Button>
-          </div>
+    <div className="flex flex-col min-h-screen p-4">
+      <div className="w-full">
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-2xl font-bold">Swap / Bridge</h1>
+          <p className="text-gray-500">Swap and bridge tokens on Lens Chain</p>
+        </div>
 
-          <div className="mb-6">
-            <Tabs defaultValue="recent">
-              <TabsList>
-                <TabsTrigger value="recent">Recent</TabsTrigger>
-                <TabsTrigger value="starred">Starred</TabsTrigger>
-                <TabsTrigger value="shared">Shared</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <FileCard title="Q4 Sales Deck" metadata="Shared folder • 8 presentations" thumbnail="/placeholder.svg" />
-            <FileCard title="Product Videos" metadata="Shared folder • 5 videos" thumbnail="/placeholder.svg" />
-            <FileCard title="ROI Calculator" metadata="Shared file • 1 Excel" thumbnail="/placeholder.svg" />
+        <div className="mt-6 pl-0">
+          <div className="w-full">
+            <LiFiWidget
+              integrator="Lens Chain"
+              config={{
+                variant: "wide",
+                theme: {
+                  container: {
+                    border: "1px solid rgb(234, 234, 234)",
+                    borderRadius: "16px",
+                  },
+                  palette: {
+                    primary: {
+                      main: "#000000",
+                    },
+                    secondary: {
+                      main: "#666666",
+                    },
+                    background: {
+                      paper: "#FFFFFF",
+                      default: "#FFFFFF",
+                    },
+                    text: {
+                      primary: "#000000",
+                      secondary: "#666666",
+                    },
+                  },
+                },
+                fromChain: 232,
+                toChain: 232,
+                appearance: "light",
+                bridges: {
+                  allow: ["across"],
+                },
+                hiddenUI: ["poweredBy", "walletMenu"],
+                tokens: {
+                  featured: [
+                    {
+                      address: "0x0000000000000000000000000000000000000000",
+                      symbol: "GHO",
+                      decimals: 18,
+                      chainId: 232,
+                      name: "GHO Token",
+                      logoURI: "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjMjhkMzU4OwogICAgICB9CgogICAgICAuY2xzLTEsIC5jbHMtMiB7CiAgICAgICAgc3Ryb2tlLXdpZHRoOiAwcHg7CiAgICAgIH0KCiAgICAgIC5jbHMtMiB7CiAgICAgICAgZmlsbDogI2ZmZjsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSIxNTAiIGN5PSIxNTAiIHI9IjE1MCIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTk0Ljg0LDEzMC40MmMwLDEzLjQ5LDEwLjkzLDI0LjQyLDI0LjQyLDI0LjQyczI0LjQyLTEwLjkzLDI0LjQyLTI0LjQyLTEwLjkzLTI0LjQyLTI0LjQyLTI0LjQyLTI0LjQyLDEwLjkzLTI0LjQyLDI0LjQyWiIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTE1Ni4zOSwxMzAuNDJjMCwxMy40OSwxMC45MywyNC40MiwyNC40MiwyNC40MnMyNC40Mi0xMC45MywyNC40Mi0yNC40Mi0xMC45My0yNC40Mi0yNC40Mi0yNC40Mi0yNC40MiwxMC45My0yNC40MiwyNC40MloiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0yNjUuNzMsMjQ1LjQ0di04My4yM2gtMzEuNGMtNi4zNSw0MS45OC00MC45OCw3Mi41Ni04NC4zMyw3Mi41Ni00Ny45LDAtODYuMTctMzcuMzMtODYuMTctODYuMTRzMzguMjctODYuODQsODYuMTgtODYuODRjNDEuNzYsMCw3Ni4xOCwyOC45MSw4NC4zNCw2OC42NWgzMS40Yy04LjU5LTU2LjUtNTcuODktOTkuNzctMTE1Ljc5LTk5Ljc3LTYzLjkzLDAtMTE1Ljc5LDUyLjgyLTExNS43OSwxMTcuOTVzNTEuODIsMTE3Ljk1LDExNS43NSwxMTcuOTVjNDAuMjMsMCw2OC4yOC0xOC42Myw4NS40OS00Ny45Ny40MS4xMi44My4yMSwxLjIyLjMzdjUzLjQ4YzEwLjgzLTcuNjgsMjAuNTktMTYuNzYsMjkuMDItMjYuOThaIi8+Cjwvc3ZnPg==",
+                    },
+                    {
+                      address: "0xE5ecd226b3032910CEaa43ba92EE8232f8237553",
+                      symbol: "WETH",
+                      decimals: 18,
+                      chainId: 232,
+                      name: "Wrapped Ether",
+                    },
+                    {
+                      address: '0x88F08E304EC4f90D644Cec3Fb69b8aD414acf884',
+                      symbol: "USDC",
+                      decimals: 6,
+                      chainId: 232,
+                      name: "USDC",
+                    },
+                    {
+                      address: '0xB0588f9A9cADe7CD5f194a5fe77AcD6A58250f82',
+                      symbol: "BONSAI",
+                      decimals: 18,
+                      chainId: 232,
+                      name: "Bonsai Token",
+                    }
+                  ]
+                }
+              }}
+            />
           </div>
         </div>
       </div>
     </div>
   )
-}
+} 
