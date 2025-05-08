@@ -36,7 +36,7 @@ export default function SocialPage() {
     try {
       const authenticated = await lensClient.login({
         accountOwner: {
-          app: "0x8A5Cc31180c37078e1EbA2A23c861Acf351a97cE",
+          app: process.env.NEXT_PUBLIC_LENS_APP_ADDRESS || '0x0000000000000000000000000000000000000000',
           owner: address,
           account: profile.account.address,
         },
