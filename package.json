@@ -11,6 +11,7 @@
   "dependencies": {
     "@bigmi/react": "^0.1.1",
     "@covalenthq/client-sdk": "^2.2.6",
+    "@halliday-sdk/commerce": "^3.2.2",
     "@lens-chain/sdk": "1.0.2",
     "@lens-protocol/client": "0.0.0-canary-20250430134539",
     "@lifi/widget": "^3.19.2",
